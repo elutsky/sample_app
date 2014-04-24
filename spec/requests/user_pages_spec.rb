@@ -43,18 +43,28 @@ describe "User pages" do
 
       describe "as an admin user" do
         let(:admin) { FactoryGirl.create(:admin) }
+        let(:firstUser) { User.first }
         before do
           sign_in admin
           visit users_path
         end
 
-        it { should have_link('delete', href: user_path(User.first)) }
+        it { should have_link('delete', href: user_path(firstUser)) }
         it "should be able to delete another user" do
           expect do
             click_link('delete', match: :first)
           end.to change(User, :count).by(-1)
         end
+
         it { should_not have_link('delete', href: user_path(admin)) }
+
+        #from http://stackoverflow.com/questions/10989427/rspec-test-destroy-method-rails-tutorial-3-2-ch-9-ex-10
+        # it "should not allow the admin to delete herself" do
+        #   expect { delete user_path(firstUser), {},
+        #                   'HTTP_COOKIE' => "remember_token=#{firstUser.remember_token},
+        # #{Capybara.current_session.driver.response.headers["Set-Cookie"]}" }.
+        #       to_not change(User, :count)
+        # end
       end
     end
   end
